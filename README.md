@@ -1,4 +1,4 @@
-# Configuring and running CamillDSP
+# Configuring and running CamillaDSP
 
 ## Running as a systemd service under Fedora 31
 This is a way to run CamillaDSP as a systemd service to provide system wide filtering. This uses the Alsa backend for both capture and playback. These steps work on Fedora 31. Other distributions are probably similar, but there are probably some differences. If you try on another distribution and have to do something differently, please let me know and I will add that here.
