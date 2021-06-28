@@ -1,7 +1,7 @@
-# Configuring and running CamillDSP
+# Configuring and running CamillaDSP
 
-## Running as a systemd service under Fedora 31
-This is a way to run CamillaDSP as a systemd service to provide system wide filtering. This uses the Alsa backend for both capture and playback. These steps work on Fedora 31. Other distributions are probably similar, but there are probably some differences. If you try on another distribution and have to do something differently, please let me know and I will add that here.
+## Running as a systemd service under Fedora 31 and newer
+This is a way to run CamillaDSP as a systemd service to provide system wide filtering. This uses the Alsa backend for both capture and playback. These steps work on Fedora 31 and newer. Other distributions are probably similar, but there are likely some differences. If you try on another distribution and have to do something differently, please let me know and I will add that here.
 
 ### Step 1: Install CamillaDSP to /usr/local/bin
 - Clone the repo and install with ```sudo cargo install --path . --root /usr/local/```
@@ -41,17 +41,62 @@ This creates a "plug" device named "camilladsp" that sends its output to the Loo
 - Unplug the dac, wait a few seconds and plug it back in. Then check that the service started: ```sudo systemctl status camilladsp```
 
 
-### Step 6 (optional) Send PulseAudio output to CamillaDSP (for desktop apps)
+### Step 6 (optional) Send desktop audio to CamillaDSP
+Follow either the PulseAudio or the Pipewire steps.
+
+To check what your system uses, run `pactl info` in a terminal and look at the line starting with "Server Name":
+```
+> pactl info
+...
+Server Name: PulseAudio (on PipeWire 0.3.30)
+...
+```
+In this example Pipewire is used. 
+
+#### PulseAudio
 - Open ```/etc/pulse/default.pa``` in a text editor (see ```default.pa``` for an example).
 - Add these two lines (lines 43-44 in example):
-```
-load-module module-alsa-sink device="camilladsp" sink_name="CamillaDSP"
-update-sink-proplist CamillaDSP device.description=CamillaDSP
-```
+    ```
+    load-module module-alsa-sink device="camilladsp" sink_name="CamillaDSP"
+    update-sink-proplist CamillaDSP device.description=CamillaDSP
+    ```
 - Comment out the autodetection module (lines 47-54 in example). This stops PulseAudio from finding and trying to use the Loopback and dac directly.
 - Set camilladsp as the default sink (line 152): ```set-default-sink camilladsp```
 - Save the file.
 
+#### Pipewire
+- Open ```~/.config/pipewire/pipewire.conf``` in a text editor. If the file doesn't exist, create it by copying the template from: ```/usr/share/pipewire/pipewire.conf```
+- Under `context.properties`, set the desired sample rate:
+    ```
+        default.clock.rate        = 44100
+    ```
+
+- Add this block under `context.objects`:
+
+    ```
+        {   factory = adapter
+            args = {
+                factory.name            = api.alsa.pcm.sink
+                node.name               = "alsa-sink"
+                node.description        = "Alsa Loopback"
+                media.class             = "Audio/Sink"
+                api.alsa.path           = "hw:Loopback,1,0"
+                #api.alsa.period-size   = 1024
+                #api.alsa.headroom      = 0
+                #api.alsa.disable-mmap  = false
+                #api.alsa.disable-batch = false
+                audio.format           = "S32LE"
+                audio.rate             = 44100
+                audio.channels         = 2
+                #audio.position         = "FL,FR"
+            }
+        }
+    ```
+- Set `api.alsa.path` to the name of the loopback to output to.
+- Set `audio.rate` to match the rate set above.
+- If unsure, compare with the `pipewire.conf` in this repository.
+- Save the file.
+- After reboot, the audio settings should show a new output device called "Alsa Loopback".
 
 ### Step 7: Reboot to verify that everything starts ok
 
