@@ -4,7 +4,9 @@
 This is a way to run CamillaDSP as a systemd service to provide system wide filtering. This uses the Alsa backend for both capture and playback. These steps work on Fedora 31 and newer. Other distributions are probably similar, but there are likely some differences. If you try on another distribution and have to do something differently, please let me know and I will add that here.
 
 ### Step 1: Install CamillaDSP to /usr/local/bin
-- Clone the repo and install with ```sudo cargo install --path . --root /usr/local/```
+- Install the CamillaDSP binary:
+  - Option 1: download a pre-build binary from [releases](https://github.com/HEnquist/camilladsp/releases) and copy it to `/usr/local/bin/`.
+  - Option 2: clone the CamillaDSP repo and install with ```sudo cargo install --path . --root /usr/local/```
 
 ### Step 2: Load loopback driver on boot
 - Copy ```aloop.conf``` to ```/etc/modules-load.d/aloop.conf```
@@ -30,7 +32,7 @@ This creates a "plug" device named "camilladsp" that sends its output to the Loo
 - Start the service: ```sudo systemctl start camilladsp```
 - Check the service status: ```sudo systemctl status camilladsp```
 - If all ok, enable the service so it runs automatically: ```sudo systemctl enable camilladsp```
-
+- Optionally for the GUI, repeat this procedure for the `camillagui.service` file.
 
 ### Step 5 (Optional,for usb dac) Add udev rule to start service when dac is connected
 - Figure out the vendor id of the dac using udevadm. Run ```udevadm monitor --subsystem-match=usb --property --udev``` and plug in the dac. There should be a few pages of output (see udevadm_output.txt for an example). 
@@ -99,6 +101,9 @@ In this example Pipewire is used.
 - After reboot, the audio settings should show a new output device called "Alsa Loopback".
 
 ### Step 7: Reboot to verify that everything starts ok
+
+## Other files included
+- `asound_multidevice.conf`: An example Alsa configuration for combining two stereo dacs into a 4-channel one. This only works well if the two dacs share the same clock. Using two synchronous USB dacs connected to the same USB bus should work, as they will both lock their sample rate to the USB bus clock.
 
 
 
