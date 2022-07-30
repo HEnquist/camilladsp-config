@@ -28,7 +28,7 @@ filters:
       filename: /path/to/lowpass.txt
 
 mixers:
-  to8:
+  to4:
     channels:
       in: 2
       out: 4
