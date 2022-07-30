@@ -1,7 +1,7 @@
 ---
 devices:
   samplerate: 44100
-  buffersize: 2048
+  chunksize: 2048
   silence_threshold: -60
   silence_timeout: 3.0
   capture:
