@@ -34,7 +34,7 @@ This creates a "plug" device named "camilladsp" that sends its output to the Loo
 - If all ok, enable the service so it runs automatically: ```sudo systemctl enable camilladsp```
 - Optionally for the GUI, repeat this procedure for the `camillagui.service` file.
 
-### Step 5 (Optional,for usb dac) Add udev rule to start service when dac is connected
+### Step 5: (Optional,for usb dac) Add udev rule to start service when dac is connected
 - Figure out the vendor id of the dac using udevadm. Run ```udevadm monitor --subsystem-match=usb --property --udev``` and plug in the dac. There should be a few pages of output (see udevadm_output.txt for an example). 
 - Look for the vendor id of the dac. In the example it's "20b1".
 - Edit ```90-camilladsp.rules``` and replace the id with the one for your dac.
@@ -43,8 +43,8 @@ This creates a "plug" device named "camilladsp" that sends its output to the Loo
 - Unplug the dac, wait a few seconds and plug it back in. Then check that the service started: ```sudo systemctl status camilladsp```
 
 
-### Step 6 (optional) Send desktop audio to CamillaDSP
-Follow either the PulseAudio or the Pipewire steps.
+### Step 6: (optional) Send desktop audio to CamillaDSP
+Follow **either** the PulseAudio or the Pipewire steps.
 
 To check what your system uses, run `pactl info` in a terminal and look at the line starting with "Server Name":
 ```
@@ -53,7 +53,7 @@ To check what your system uses, run `pactl info` in a terminal and look at the l
 Server Name: PulseAudio (on PipeWire 0.3.30)
 ...
 ```
-In this example Pipewire is used. 
+In the above output, Pipewire is in use. If Pulseaudio is used by the system, the server name will normally be "pulseaudio" only.
 
 #### PulseAudio
 - Open ```/etc/pulse/default.pa``` in a text editor (see ```default.pa``` for an example).
@@ -82,7 +82,7 @@ In this example Pipewire is used.
                 node.name               = "alsa-sink"
                 node.description        = "Alsa Loopback"
                 media.class             = "Audio/Sink"
-                api.alsa.path           = "hw:Loopback,1,0"
+                api.alsa.path           = "hw:Loopback,0,0"
                 #api.alsa.period-size   = 1024
                 #api.alsa.headroom      = 0
                 #api.alsa.disable-mmap  = false
