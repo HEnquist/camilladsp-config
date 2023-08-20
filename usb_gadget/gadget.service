@@ -1,0 +1,8 @@
+[Unit]
+Description=Audio Gadget
+
+[Service]
+ExecStart=/usr/local/bin/gadget.sh
+
+[Install]
+WantedBy=multi-user.target
